@@ -46,6 +46,16 @@
 #modeScreen .creditsButton{position:absolute;right:clamp(18px,3vw,44px);bottom:22px;font-size:9px;padding:9px 12px}
 @media(max-width:850px){#modeScreen .selectorShell{grid-template-columns:1fr;padding:100px 14px 70px;gap:15px}#modeScreen .brandCorner{top:14px;left:15px;width:200px;font-size:25px}#modeScreen .brandCorner small{font-size:8px}#modeScreen .selectorNav{padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;align-self:auto}#modeScreen .navChoice{font:8px var(--mono);padding:9px 4px;text-align:center}#modeScreen .navChoice:before{margin-right:4px;font-size:14px}#modeScreen .selectorMain{align-self:auto;padding:12px}#modeScreen .selectorSide{display:none}#modeScreen .selectorVersion{top:18px;font-size:8px}#modeScreen .selectorBottom{display:none}#modeScreen .creditsButton{bottom:12px;right:14px}}
 @media(max-width:520px){#modeScreen .selectorCard{grid-template-columns:1fr}#modeScreen .corridorPreview{min-height:90px}#modeScreen .selectorCopy h3{margin-bottom:8px}#modeScreen .selectorCopy p{font-size:11px;margin-bottom:10px}#modeScreen .selectorForm button{flex:1}#modeScreen .selectorHeading{font-size:12px}}
+
+/* v2.0.0 compact side navigation */
+#modeScreen .selectorShell{grid-template-columns:minmax(240px,32%) 1fr;align-items:center}
+#modeScreen .selectorNav{grid-column:1;grid-row:1;align-self:center;padding-top:0;max-width:420px;width:100%;gap:12px}
+#modeScreen .navChoice{min-height:58px}
+#modeScreen .selectorSide{grid-column:2;grid-row:1;justify-self:end;align-self:end;margin:0 3vw 12vh 0;max-width:190px}
+#modeScreen .selectorBottom{left:clamp(20px,2.5vw,42px)}
+#modeScreen .selectorVersion{font-size:11px}
+#modeScreen .navChoice:disabled{opacity:.35;cursor:not-allowed}
+@media(max-width:850px){#modeScreen .selectorShell{grid-template-columns:1fr;align-content:center}#modeScreen .selectorNav{grid-column:1;grid-row:1;max-width:none;gap:8px}#modeScreen .navChoice{min-height:48px}#modeScreen .selectorSide{display:block;grid-column:1;grid-row:2;justify-self:start;align-self:auto;margin:14px 0 0 10px;font-size:9px}#modeScreen .selectorVersion{right:15px}}
 </style>
 </head>
 <body>
@@ -54,14 +64,10 @@
 <section class="screen" id="modeScreen">
 <div class="selectorShell">
 <div class="brandCorner">LOST<small>NIGHT.LOL // INTERACTIVE HORROR</small></div>
-<div class="selectorVersion">v1.0.0<br>// STAY AWAKE</div>
+<div class="selectorVersion">v2.0.0<br>// STAY AWAKE</div>
 <nav class="selectorNav"><button class="navChoice selected" id="navNew">NEW GAME</button><button class="navChoice" id="navLoad">LOAD GAME</button><button class="navChoice" id="navSettings">SETTINGS</button><button class="navChoice" id="navQuit">QUIT</button></nav>
-<main class="selectorMain"><h2 class="selectorHeading">GAME SELECT</h2>
-<div class="selectorCard"><div class="corridorPreview"><i></i></div><div class="selectorCopy"><h3>NEW GAME</h3><p>Start a fresh run.<br>The maze will be randomly generated, and your progress will be saved automatically.</p><label for="selectorRunName">SAVE NAME:</label><div class="selectorForm"><input id="selectorRunName" class="field" maxlength="30" placeholder="NightRunner" autocomplete="off"><button id="selectorCreate">CREATE　›</button></div></div></div>
-<div class="selectorCard"><div class="corridorPreview"><i></i></div><div class="selectorCopy"><h3>LOAD GAME</h3><p>Continue your last run.<br>Your progress will be restored from the most recent save file.</p><div class="selectorForm"><div class="savePreview"><strong id="selectorSaveName">No saved transmission</strong><span id="selectorSaveMeta">Start a new game to create a save.</span></div><button id="selectorLoad">LOAD　›</button></div></div></div>
-<div class="selectorFoot">▣　Progress is saved locally in your browser. Clearing your browser data may delete your saves.</div></main>
-<aside class="selectorSide">SOME DOORS<br>ARE NOT MEANT<br>TO BE FOUND...<br><br>///</aside>
-<div class="selectorBottom">// EXPLORE<br>// SURVIVE<br>// FIND THE EXIT</div><button class="creditsButton" id="selectorCredits">CREDITS　›</button>
+<div class="selectorSide">SOME DOORS<br>ARE NOT MEANT<br>TO BE FOUND...<br><br>///<br><br><span>// EXPLORE<br>// SURVIVE<br>// FIND THE EXIT</span></div>
+<div class="selectorBottom">NIGHT.LOL // LOST — V2.0.0</div>
 </div></section>
 <section class="screen hidden" id="nameScreen"><div class="panel"><div class="eyebrow">NEW TRANSMISSION // INITIALIZE</div><h2 class="title" data-text="IDENTIFY">IDENTIFY</h2><p class="subtitle">Give this run a name before the corridor is generated.</p><label for="runName" class="eyebrow">TRANSMISSION NAME</label><input id="runName" class="field" maxlength="30" placeholder="THE LONG WAY HOME" autocomplete="off"><div class="actions"><button class="primary" id="createButton">GENERATE MAZE ↗</button><button id="nameBack">CANCEL</button></div></div></section>
 <section class="screen hidden" id="loadScreen"><div class="loadingWrap"><div class="eyebrow">NIGHT.LOL / PROCEDURAL WORLD ENGINE</div><div class="loadingTitle" id="loadingTitle">BUILDING CORRIDOR GEOMETRY...</div><div class="loadTrack"><div class="loadFill" id="loadFill"></div></div><div class="loadMeta"><span id="loadingDetail">ALLOCATING MAZE / TEXTURES / LIGHT</span><span id="loadPercent">00%</span></div><p class="tiny" id="loadingTip">THE SHAPE OF THE HALLWAY IS NEVER THE SAME TWICE.</p></div></section>
@@ -98,15 +104,11 @@ function blocked(x,z,r){for(let ox of [-r,r])for(let oz of [-r,r]){let ix=Math.f
 function pauseGame(title='TRANSMISSION SUSPENDED',desc='Your current position and maze are saved locally.'){active=false;save();$('hud').classList.remove('show');$('pauseScreen').querySelector('.title').textContent=title;$('pauseScreen').querySelector('.title').dataset.text=title;$('pauseScreen').querySelector('.subtitle').textContent=desc;show('pauseScreen');if(document.pointerLockElement)document.exitPointerLock()}
 function resumeGame(){show('');$('hud').classList.add('show');active=true;lastTime=performance.now();if(renderer&&renderer.domElement)renderer.domElement.focus();requestAnimationFrame(loop)}
 $('startButton').onclick=()=>{updateSaveUI();updateSelectorSave();show('modeScreen')};
-$('navNew').onclick=()=>{document.querySelectorAll('.navChoice').forEach(b=>b.classList.remove('selected'));$('navNew').classList.add('selected');$('selectorRunName').focus()};
-$('navLoad').onclick=()=>{document.querySelectorAll('.navChoice').forEach(b=>b.classList.remove('selected'));$('navLoad').classList.add('selected');updateSelectorSave()};
-$('navSettings').onclick=()=>{document.querySelectorAll('.navChoice').forEach(b=>b.classList.remove('selected'));$('navSettings').classList.add('selected');$('loadingTip').textContent='WASD MOVE · MOUSE LOOK · SHIFT RUN · ESC PAUSE';alert('CONTROLS: WASD move · Mouse look · Shift run · Escape pause.')};
-$('navQuit').onclick=()=>{show('titleScreen')};
-$('selectorCredits').onclick=()=>alert('LOST — a NIGHT.LOL interactive horror prototype.');
-$('selectorCreate').onclick=()=>{ $('runName').value=$('selectorRunName').value; newRun(); };
-$('selectorLoad').onclick=()=>{if(saved())beginResume();else updateSelectorSave()};
-$('selectorRunName').addEventListener('keydown',e=>{if(e.key==='Enter')$('selectorCreate').click()});
-function updateSelectorSave(){let s=saved();$('selectorSaveName').textContent=s?'Save 1 - '+(s.runName||'UNTITLED RUN'):'No saved transmission';$('selectorSaveMeta').textContent=s?'Level '+(s.level||1)+' | local autosave':'Start a new game to create a save.';$('selectorLoad').disabled=!s;}
+$('navNew').onclick=()=>{document.querySelectorAll('.navChoice').forEach(b=>b.classList.remove('selected'));$('navNew').classList.add('selected');$('runName').value='';newRun();};
+$('navLoad').onclick=()=>{document.querySelectorAll('.navChoice').forEach(b=>b.classList.remove('selected'));$('navLoad').classList.add('selected');if(saved())beginResume();else $('navLoad').classList.remove('selected')};
+$('navSettings').onclick=()=>{document.querySelectorAll('.navChoice').forEach(b=>b.classList.remove('selected'));$('navSettings').classList.add('selected');alert('CONTROLS: WASD move · Mouse look · Shift run · Escape pause.')};
+$('navQuit').onclick=()=>{document.querySelectorAll('.navChoice').forEach(b=>b.classList.remove('selected'));$('navQuit').classList.add('selected');if(active)pauseGame();else show('titleScreen')};
+function updateSelectorSave(){return !!saved();}
 $('titleLoad').onclick=()=>{if(saved()){init3D();beginResume()}};$('newButton').onclick=()=>{show('nameScreen');$('runName').focus()};$('resumeButton').onclick=()=>{if(saved())beginResume()};$('modeBack').onclick=()=>show('titleScreen');$('nameBack').onclick=()=>show('modeScreen');$('createButton').onclick=newRun;$('runName').addEventListener('keydown',e=>{if(e.key==='Enter')newRun()});$('pauseButton').onclick=()=>pauseGame();$('resumeGame').onclick=resumeGame;$('saveMenu').onclick=()=>{save();$('hud').classList.remove('show');show('titleScreen');active=false;if(document.pointerLockElement)document.exitPointerLock();updateSaveUI()};$('exitTitle').onclick=()=>{$('hud').classList.remove('show');show('titleScreen');active=false;if(document.pointerLockElement)document.exitPointerLock();updateSaveUI()};$('nextLevel').onclick=()=>{level++;startLoading('GENERATING LEVEL '+String(level).padStart(2,'0')+'...',()=>{generateMaze();save()})};$('winPause').onclick=()=>{$('hud').classList.remove('show');show('titleScreen');updateSaveUI()};$('mobileRun').onpointerdown=()=>runHeld=true;$('mobileRun').onpointerup=$('mobileRun').onpointercancel=()=>runHeld=false;document.querySelectorAll('[data-move]').forEach(b=>{const k={forward:'KeyW',back:'KeyS',left:'KeyA',right:'KeyD'}[b.dataset.move];b.onpointerdown=e=>{e.preventDefault();keys[k]=true};b.onpointerup=b.onpointerleave=b.onpointercancel=()=>keys[k]=false});
 window.addEventListener('keydown',e=>{if(active&&['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();if(e.code==='Escape'&&active){pauseGame();return}keys[e.code]=true},{capture:true});window.addEventListener('keyup',e=>{keys[e.code]=false},{capture:true});window.addEventListener('blur',()=>{keys={};runHeld=false});window.addEventListener('beforeunload',()=>{if(worldReady&&maze.length)save()});function isTouch(){return matchMedia('(pointer:coarse)').matches}
 updateSaveUI();updateSelectorSave();show('modeScreen');
